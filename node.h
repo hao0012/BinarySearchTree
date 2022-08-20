@@ -1,39 +1,29 @@
 #pragma once
 #ifndef NODE_H_
 #define NODE_H_
-#include<iostream>
+#include<vector>
 using namespace std;
-
-#define getHeight(node) ((node) ? (node)->height : 0)
-#define black 1
-#define red 0
 
 class Node
 {
-	friend class BinaryTree;
-	friend class BST;
-	friend class AVL;
-	friend class Splay;
-	friend class RBTree;
+	friend class BTree;
 private:
-	int data;
-	Node* parent;
-	Node* left, * right;
-	int height;
-	bool color; // 0-red 1-black
-//private:
+	Node* parent_;
+	vector<int> data_;
+	vector<Node*> child_;
 public:
-	Node(int d = 0, Node* p = NULL, Node* l = NULL, Node* r = NULL, int h = 0, int c = red)
-		: data(d), parent(p), left(l), right(r), height(h), color(c) {};
+	Node() { parent_ = NULL; }
+	Node(int data, Node* left = NULL, Node* right = NULL, Node* parent = NULL) {
+		data_.emplace_back(data);
+		parent_ = parent;
+		if (left) left->parent_ = this;
+		child_.emplace_back(left);
+		if (right) right->parent_ = this;
+		child_.emplace_back(right);
+	}
 
-	Node* insertAsLeft(int data);
-	Node* insertAsRight(int data);
-	Node* getSuccessor() const;
-
-	Node* getTallerChild();
-
-	bool isRight() const;
-	bool isLeft() const;
+	Node(vector<int> data, vector<Node*> child, Node* parent = NULL) :
+		data_(data), child_(child), parent_(parent) {};
 };
 
 #endif // !NODE_H_
