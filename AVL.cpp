@@ -1,77 +1,35 @@
 #include"AVL.h"
 // ----------------------------- protected ------------------------------- //
 
-// ÓÒĞı
-void AVL::zig(Node*& node)
-{
-	Node*& left = node->left;
-	Node*& r = left->right;
-	left->right = node;
-	left->parent = node->parent;
-	node->parent = left;
-	node->left = r;
-	r->parent = node;
-}
-
-// ×óĞı
-void AVL::zag(Node*& node)
-{
-	Node* temp = node;
-	node = node->right;
-
-	Node* l = node->left;
-	node->left = temp;
-	temp->parent = node;
-
-	temp->right = l;
-	if(l) l->parent = temp;
-}
-
-//void AVL::rotateAt(Node** node)
-//{
-//	Node** grand = node;
-//	Node** parent = &((*node)->getTallerChild());
-//	Node** child = parent->getTallerChild();
-//	if (parent->isRight()) {
-//		if (child->isLeft()) zig(parent);
-//		zag(grand);
-//	}
-//	else {
-//		if (child->isRight()) zag(parent);
-//		zig(grand);
-//	}
-//	if (!grand->parent) root_ = grand;
-//}
-
 Node*& AVL::insert(int data)
 {
 	Node*& node = search(data);
 	if (node) return node;
 	++size_;
 	node = new Node(data, hot_);
-	if (!hot_) root_ = node; // ´ËÊ±²åÈëµÄ½ÚµãÎª¸ù½Úµã
-	// ÖØÆ½ºâ
+	if (!hot_) root_ = node; // æ­¤æ—¶æ’å…¥çš„èŠ‚ç‚¹ä¸ºæ ¹èŠ‚ç‚¹
+	// é‡å¹³è¡¡
 	for (Node* p = node->parent; p; p = p->parent) {
-		if (!isBlanced(p)) { // Èç¹û·¢ÏÖÊ§ºâ
-			// ÏÈ¼ÇÂ¼Òª±»Ğı×ªµÄ×ÓÊ÷µÄ¸¸Ç×
+		if (!isBlanced(p)) { // å¦‚æœå‘ç°å¤±è¡¡
+			// å…ˆè®°å½•è¦è¢«æ—‹è½¬çš„å­æ ‘çš„çˆ¶äº²
 			Node* temp = p->parent;
-			// Ğı×ª²¢·µ»Ø±»Ğı×ª×ÓÊ÷µÄĞÂÊ÷¸ù
+			// æ—‹è½¬å¹¶è¿”å›è¢«æ—‹è½¬å­æ ‘çš„æ–°æ ‘æ ¹
 			Node* newp = rotateAt((p->getTallerChild())->getTallerChild());
-			// ½«·µ»ØµÄ×ÓÊ÷ÓëÔ­Ê÷½øĞĞË«ÏòÁ´½Ó
-			// ¸üĞÂ×ÓÊ÷µÄ¸¸Ç×
+			// å°†è¿”å›çš„å­æ ‘ä¸åŸæ ‘è¿›è¡ŒåŒå‘é“¾æ¥
+			// æ›´æ–°å­æ ‘çš„çˆ¶äº²
 			newp->parent = temp;
-			// ¸üĞÂ×ÓÊ÷ÔÚÆä¸¸Ç×µÄ×Ó½ÚµãÖĞµÄÎ»ÖÃ
+			// æ›´æ–°å­æ ‘åœ¨å…¶çˆ¶äº²çš„å­èŠ‚ç‚¹ä¸­çš„ä½ç½®
 			if (temp) {
 				if (p == temp->left) temp->left = newp;
 				else temp->right = newp;
 			}
-			// Èç¹ûĞı×ª×ÓÊ÷¸ùÎªÕûÊ÷µÄ¸ù£¬ÄÇÃ´¸üĞÂroot_
+			// å¦‚æœæ—‹è½¬å­æ ‘æ ¹ä¸ºæ•´æ ‘çš„æ ¹ï¼Œé‚£ä¹ˆæ›´æ–°root_
 			if (p == root_) root_ = newp;
-			// Ğı×ªºó×ÓÊ÷¸ß¶ÈÓëÎ´²åÈëÇ°ÏàÍ¬£¬Òò´Ë²»ÓÃ¸üĞÂ¸ß¶È
+			// æ—‹è½¬åå­æ ‘é«˜åº¦ä¸æœªæ’å…¥å‰ç›¸åŒï¼Œå› æ­¤ä¸ç”¨æ›´æ–°é«˜åº¦
 			break;
 		}
 		else {
-			// ¸üĞÂ¸ß¶È
+			// æ›´æ–°é«˜åº¦
 			updateHeight(p);
 		}
 	}
@@ -84,24 +42,24 @@ bool AVL::remove(int data)
 	if (!target) return false;
 	removeAt(target);
 	--size_;
-	// ÖØÆ½ºâ
+	// é‡å¹³è¡¡
 	for (Node* p = target->parent; p; p = p->parent) {
-		if (!isBlanced(p)) { // Èç¹û·¢ÏÖÊ§ºâ
-			// ÏÈ¼ÇÂ¼Òª±»Ğı×ªµÄ×ÓÊ÷µÄ¸¸Ç×
+		if (!isBlanced(p)) { // å¦‚æœå‘ç°å¤±è¡¡
+			// å…ˆè®°å½•è¦è¢«æ—‹è½¬çš„å­æ ‘çš„çˆ¶äº²
 			Node* temp = p->parent;
-			// Ğı×ª²¢·µ»Ø¸Ã×ÓÊ÷µÄĞÂÊ÷¸ù
+			// æ—‹è½¬å¹¶è¿”å›è¯¥å­æ ‘çš„æ–°æ ‘æ ¹
 			Node* newp = rotateAt((p->getTallerChild())->getTallerChild());
-			// ÏÂÃæ2²½½«·µ»ØµÄ×ÓÊ÷ÓëÔ­Ê÷½øĞĞË«ÏòÁ´½Ó
-			// 1.¸üĞÂ×ÓÊ÷µÄ¸¸Ç×
+			// ä¸‹é¢2æ­¥å°†è¿”å›çš„å­æ ‘ä¸åŸæ ‘è¿›è¡ŒåŒå‘é“¾æ¥
+			// 1.æ›´æ–°å­æ ‘çš„çˆ¶äº²
 			newp->parent = temp;
-			// 2.¸üĞÂ×ÓÊ÷ÔÚÆä¸¸Ç×µÄ×Ó½ÚµãÖĞµÄÎ»ÖÃ
+			// 2.æ›´æ–°å­æ ‘åœ¨å…¶çˆ¶äº²çš„å­èŠ‚ç‚¹ä¸­çš„ä½ç½®
 			if (temp) {
 				if (p == temp->left) temp->left = newp;
 				else temp->right = newp;
 			}
-			// Èç¹ûĞı×ª×ÓÊ÷¸ùÎªÕûÊ÷µÄ¸ù£¬ÄÇÃ´¸üĞÂroot_
+			// å¦‚æœæ—‹è½¬å­æ ‘æ ¹ä¸ºæ•´æ ‘çš„æ ¹ï¼Œé‚£ä¹ˆæ›´æ–°root_
 			if (p == root_) root_ = newp;
-			updateHeight(p); // ¸ß¶È¸üĞÂ
+			updateHeight(p); // é«˜åº¦æ›´æ–°
 		}
 	}
 	return true;
