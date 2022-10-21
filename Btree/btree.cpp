@@ -7,49 +7,49 @@ void BTree::overflow(Node* node)
 		vector<Node*>& child = node->child_;
 		int size = store.size();
 		if (size == order_) {
-			// ÕÒµ½ÖĞ¼äÎ»ÖÃ¼°Êı¾İ:
+			// æ‰¾åˆ°ä¸­é—´ä½ç½®åŠæ•°æ®:
 			int mi = size / 2;
 			int mid = node->data_[mi];
-			// ´´½¨Ò»¸öĞÂµÄ·ÖÖ§:
-			// 1. ¼ôÇĞÓÒ°ë²àµÄÊı¾İµ½Ò»¸öĞÂÊı×é
+			// åˆ›å»ºä¸€ä¸ªæ–°çš„åˆ†æ”¯:
+			// 1. å‰ªåˆ‡å³åŠä¾§çš„æ•°æ®åˆ°ä¸€ä¸ªæ–°æ•°ç»„
 			vector<int> rightData = vector<int>(store.begin() + mi + 1, store.end());
 			store.erase(store.begin() + mi, store.end());
-			// 2. ¼ôÇĞÓÒ°ë²àµÄ×Ó½Úµãµ½Ò»¸öĞÂÊı×é
+			// 2. å‰ªåˆ‡å³åŠä¾§çš„å­èŠ‚ç‚¹åˆ°ä¸€ä¸ªæ–°æ•°ç»„
 			vector<Node*> rightChild = vector<Node*>(child.begin() + mi + 1, child.end());
 			child.erase(child.begin() + mi + 1, child.end());
-			// 3. ÓÃ1,2µÄÊı¾İºÍ×Ó½Úµã´´½¨ĞÂ½Úµã
+			// 3. ç”¨1,2çš„æ•°æ®å’Œå­èŠ‚ç‚¹åˆ›å»ºæ–°èŠ‚ç‚¹
 			Node* right = new Node(rightData, rightChild, node->parent_);
-			// 4. Èç¹û²»ÔÚÒ¶½Úµã£¬º¢×Ó²»Îª¿Õ Ôò½«º¢×ÓµÄ¸¸Ç×ÉèÎªright
+			// 4. å¦‚æœä¸åœ¨å¶èŠ‚ç‚¹ï¼Œå­©å­ä¸ä¸ºç©º åˆ™å°†å­©å­çš„çˆ¶äº²è®¾ä¸ºright
 			if (rightChild[0]) { 
 				for (auto& child : rightChild) 
 					child->parent_ = right;
 			}
-			// ½«mid²åÈë¸¸½Úµã:
-			// (1) Èç¹ûnodeÃ»ÓĞ¸¸½Úµã:
+			// å°†midæ’å…¥çˆ¶èŠ‚ç‚¹:
+			// (1) å¦‚æœnodeæ²¡æœ‰çˆ¶èŠ‚ç‚¹:
 			if (!node->parent_) {
-				// ÄÇÃ´´´½¨¸¸½Úµã£¬mid³ÉÎª¸¸½ÚµãÊı¾İ
+				// é‚£ä¹ˆåˆ›å»ºçˆ¶èŠ‚ç‚¹ï¼Œmidæˆä¸ºçˆ¶èŠ‚ç‚¹æ•°æ®
 				Node* root = new Node(mid, node, right); 
 				node->parent_ = root;
 				right->parent_ = root;
-				root_ = root; // ĞÂroot
+				root_ = root; // æ–°root
 			}
-			// (2) Èç¹ûnodeÓĞ¸¸½Úµã
+			// (2) å¦‚æœnodeæœ‰çˆ¶èŠ‚ç‚¹
 			else { 
 				vector<int>& parentData = node->parent_->data_;
-				// 1. ÔÚ¸¸½ÚµãÖĞÕÒµ½²åÈëmidµÄÎ»ÖÃ
+				// 1. åœ¨çˆ¶èŠ‚ç‚¹ä¸­æ‰¾åˆ°æ’å…¥midçš„ä½ç½®
 				int i = find(parentData, mid);
-				// 2. ¸¸½Úµã²åÈëmid
+				// 2. çˆ¶èŠ‚ç‚¹æ’å…¥mid
 				parentData.insert(parentData.begin() + i, mid);
-				// 3. ¸¸½ÚµãµÄchildÖĞ¼ÇÂ¼right½Úµã
+				// 3. çˆ¶èŠ‚ç‚¹çš„childä¸­è®°å½•rightèŠ‚ç‚¹
 				node->parent_->child_.insert(node->parent_->child_.begin() + i + 1, right);
 			}
-			// Èç¹û¸¸½ÚµãÊı¾İ¸öÊı³¬±ê£¬ÄÇÃ´¶Ô¸¸½ÚµãÔÙ½øĞĞÍ¬Ñù²Ù×÷
+			// å¦‚æœçˆ¶èŠ‚ç‚¹æ•°æ®ä¸ªæ•°è¶…æ ‡ï¼Œé‚£ä¹ˆå¯¹çˆ¶èŠ‚ç‚¹å†è¿›è¡ŒåŒæ ·æ“ä½œ
 			overflow(node->parent_);
 		}
 	}
 }
 
-// ·µ»ØstoreÖĞ²»Ğ¡ÓÚdataµÄ×îĞ¡ÖµÏÂ±ê
+// è¿”å›storeä¸­ä¸å°äºdataçš„æœ€å°å€¼ä¸‹æ ‡
 template<typename T>
 int BTree::find(vector<T>& store, T data)
 {
@@ -59,7 +59,7 @@ int BTree::find(vector<T>& store, T data)
 		if (store[i] >= data) break;
 	return i;
 }
-// ½«ÏòÁ¿v·ÖÎª[0, point)¡¢point¡¢(point, end]Èı²¿·Ö
+// å°†å‘é‡våˆ†ä¸º[0, point)ã€pointã€(point, end]ä¸‰éƒ¨åˆ†
 template<typename T> 
 vector<T>& BTree::split(vector<T>& v, int point, bool reservePoint)
 {
@@ -88,7 +88,7 @@ Node* BTree::search(int data)
 bool BTree::insert(int data)
 {
 	Node* node = search(data);
-	if (node) return false; // Èç¹ûÒÑÓĞÔò²åÈëÊ§°Ü
+	if (node) return false; // å¦‚æœå·²æœ‰åˆ™æ’å…¥å¤±è´¥
 	if (!hot_) root_ = new Node(data);
 	else {
 		vector<int>& store = hot_->data_;
@@ -103,14 +103,14 @@ bool BTree::insert(int data)
 void BTree::underflow(Node* node)
 {
 	if (!node) return;
-	if (node == root_) { // Èôµ±Ç°Îª¸ù
-		if (node->data_.size() == 0) { // Èô¸ùÖĞÎŞÊı¾İ
-			if (node->child_[0]) { // Èô¸ùµÄ×ÓÓĞÊı¾İ
-				root_ = node->child_[0]; // ¾Í½«×ÓÖÃÎªĞÂ¸ù
+	if (node == root_) { // è‹¥å½“å‰ä¸ºæ ¹
+		if (node->data_.size() == 0) { // è‹¥æ ¹ä¸­æ— æ•°æ®
+			if (node->child_[0]) { // è‹¥æ ¹çš„å­æœ‰æ•°æ®
+				root_ = node->child_[0]; // å°±å°†å­ç½®ä¸ºæ–°æ ¹
 				root_->parent_ = NULL;
 				node->child_[0] = NULL;
 			}
-			else root_ = NULL; // Èç¹û×ÓÒ²Ã»ÓĞÊı¾İ£¬ ÄÇÃ´Õû¿ÃÊ÷Îª¿Õ
+			else root_ = NULL; // å¦‚æœå­ä¹Ÿæ²¡æœ‰æ•°æ®ï¼Œ é‚£ä¹ˆæ•´æ£µæ ‘ä¸ºç©º
 			delete node;
 		}
 		return;
@@ -118,31 +118,31 @@ void BTree::underflow(Node* node)
 	vector<int>& store = node->data_;
 	int size = store.size();
 	if (size == (order_ + 1) / 2 - 2) {
-		// nodeµÄĞÖµÜ
+		// nodeçš„å…„å¼Ÿ
 		vector<Node*>& brothers = node->parent_->child_;
 		int bsize = brothers.size();
-		// ÕÒµ½nodeÔÚbrothersÖĞµÄÎ»ÖÃÏÂ±ê
+		// æ‰¾åˆ°nodeåœ¨brothersä¸­çš„ä½ç½®ä¸‹æ ‡
 		int i = 0;
 		for (; i < bsize; ++i) if (brothers[i] == node) break;
-		// 1. Èç¹ûÓĞ×óĞÖµÜÇÒ×óĞÖµÜÔªËØ×ã¹»
+		// 1. å¦‚æœæœ‰å·¦å…„å¼Ÿä¸”å·¦å…„å¼Ÿå…ƒç´ è¶³å¤Ÿ
 		if (i > 0) { 
-			int brotherDataSize = brothers[i - 1]->data_.size();// ×óĞÖµÜÖĞÔªËØ¸öÊı
-			int brotherChildSize = brothers[i - 1]->child_.size(); // ×óĞÖµÜÖĞº¢×Ó¸öÊı
-			if (brotherDataSize >= (order_ + 1) / 2) { // ×óĞÖµÜÔªËØ×ã¹» ÄÇÃ´´Ó×óĞÖµÜ½èÒ»¸ö
-				// ½«¸¸·ÅÔÚnodeµÄÔªËØµÄ¿ªÍ·
+			int brotherDataSize = brothers[i - 1]->data_.size();// å·¦å…„å¼Ÿä¸­å…ƒç´ ä¸ªæ•°
+			int brotherChildSize = brothers[i - 1]->child_.size(); // å·¦å…„å¼Ÿä¸­å­©å­ä¸ªæ•°
+			if (brotherDataSize >= (order_ + 1) / 2) { // å·¦å…„å¼Ÿå…ƒç´ è¶³å¤Ÿ é‚£ä¹ˆä»å·¦å…„å¼Ÿå€Ÿä¸€ä¸ª
+				// å°†çˆ¶æ”¾åœ¨nodeçš„å…ƒç´ çš„å¼€å¤´
 				node->data_.insert(node->data_.begin(), node->parent_->data_[i - 1]); 
-				// ¸¸±äÎª½èÀ´µÄÄÇ¸öÔªËØ
+				// çˆ¶å˜ä¸ºå€Ÿæ¥çš„é‚£ä¸ªå…ƒç´ 
 				node->parent_->data_[i - 1] = brothers[i - 1]->data_[brotherDataSize - 1];
-				// ×óĞÖµÜÖĞÉ¾³ı±»½è×ßµÄÄÇ¸öÔªËØ
+				// å·¦å…„å¼Ÿä¸­åˆ é™¤è¢«å€Ÿèµ°çš„é‚£ä¸ªå…ƒç´ 
 				brothers[i - 1]->data_.pop_back();
-				// ×óĞÖµÜµÄ×îºóÒ»¸öº¢×Ó¸ønode×÷µÚÒ»¸öº¢×Ó
+				// å·¦å…„å¼Ÿçš„æœ€åä¸€ä¸ªå­©å­ç»™nodeä½œç¬¬ä¸€ä¸ªå­©å­
 				node->child_.insert(node->child_.begin(), brothers[i - 1]->child_[brotherChildSize - 1]);
-				// É¾³ı×óĞÖµÜµÄ×îºóÒ»¸öº¢×Ó
+				// åˆ é™¤å·¦å…„å¼Ÿçš„æœ€åä¸€ä¸ªå­©å­
 				brothers[i - 1]->child_.pop_back();
 				return;
 			}
 		}
-		// 2. Èç¹ûÓĞÓÒĞÖµÜÇÒÔªËØ×ã¹»
+		// 2. å¦‚æœæœ‰å³å…„å¼Ÿä¸”å…ƒç´ è¶³å¤Ÿ
 		if (i < brothers.size() - 1) { 
 			int brotherDataSize = brothers[i + 1]->data_.size(); 
 			if (brotherDataSize >= (order_ + 1) / 2) { 
@@ -154,25 +154,25 @@ void BTree::underflow(Node* node)
 				return;
 			}
 		}
-		// 3. Èç¹ûÓĞ×óĞÖµÜ£¬ºÏ²¢
+		// 3. å¦‚æœæœ‰å·¦å…„å¼Ÿï¼Œåˆå¹¶
 		if (i > 0) { 
 			Node* left = brothers[i - 1];
 			vector<int>& data = left->data_;
 			vector<Node*>& child = left->child_;
-			// 1. Êı¾İºÏ²¢
+			// 1. æ•°æ®åˆå¹¶
 			data.insert(data.end(), node->parent_->data_[i - 1]);
 			data.insert(data.end(), store.begin(), store.end());
-			// 2. º¢×ÓºÏ²¢
+			// 2. å­©å­åˆå¹¶
 			child.insert(child.end(), node->child_.begin(), node->child_.end());
-			// 3. É¾³ıºÏ²¢ºó¶àÓàµÄ½Úµã
+			// 3. åˆ é™¤åˆå¹¶åå¤šä½™çš„èŠ‚ç‚¹
 			node->parent_->data_.erase(node->parent_->data_.begin() + i - 1);
 			brothers.erase(brothers.begin() + i);
 			delete node;
-			// ´¦ÀíÏÂÒç
+			// å¤„ç†ä¸‹æº¢
 			underflow(left->parent_);
 			return;
 		}
-		// 4. Èç¹ûÓĞÓÒĞÖµÜ£¬ºÏ²¢
+		// 4. å¦‚æœæœ‰å³å…„å¼Ÿï¼Œåˆå¹¶
 		if (i < brothers.size() - 1) { 
 			Node* right = brothers[i + 1];
 			vector<int>& data = right->data_;
@@ -192,20 +192,20 @@ void BTree::underflow(Node* node)
 bool BTree::remove(int data)
 {
 	Node* node = search(data);
-	if (!node) return false; // Èç¹ûÃ»ÕÒµ½ÔòÉ¾³ıÊ§°Ü
+	if (!node) return false; // å¦‚æœæ²¡æ‰¾åˆ°åˆ™åˆ é™¤å¤±è´¥
 	vector<int>& store = node->data_;
 	int i = find(store, data);
-	if (node->child_[0]) { // Èç¹ûÊı¾İ²»ÔÚÒ¶½Úµã£¬ÄÇÃ´
-		// ÕÒµ½ºó¼ÌÔªËØ
+	if (node->child_[0]) { // å¦‚æœæ•°æ®ä¸åœ¨å¶èŠ‚ç‚¹ï¼Œé‚£ä¹ˆ
+		// æ‰¾åˆ°åç»§å…ƒç´ 
 		Node* successor = node->child_[i + 1];
 		while (successor->child_[0]) successor = successor->child_[0];
-		// Óëºó¼Ì½»»»Êı¾İ
+		// ä¸åç»§äº¤æ¢æ•°æ®
 		store[i] = successor->data_[0];
-		// ´ıÉ¾³ı¶ÔÏó±äÎªºó¼Ìsuccessor->data_[0]
+		// å¾…åˆ é™¤å¯¹è±¡å˜ä¸ºåç»§successor->data_[0]
 		i = 0;
 		node = successor;
 	}
-	// É¾³ı
+	// åˆ é™¤
 	node->data_.erase(node->data_.begin() + i);
 	node->child_.erase(node->child_.begin() + i);
 	--size_;
